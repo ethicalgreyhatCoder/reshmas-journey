@@ -1,0 +1,189 @@
+<div class="app-container">
+  <header class="app-header glass-panel">
+    <button class="back-btn" (click)="goBack()">
+      ← {{ viewState === 'chapterList' ? 'Back to Dashboard' : 'Back' }}
+    </button>
+    <h1 class="app-title text-glow">Learn Bengali</h1>
+    <div class="header-actions">
+      @if (viewState === 'learning') {
+        <button class="btn-primary" (click)="openTestSetup()">Take a Test</button>
+      }
+      @if (viewState === 'testSetup' || viewState === 'testing') {
+        <button class="btn-primary exit-btn" (click)="goBack()">Exit Test</button>
+      }
+    </div>
+  </header>
+
+  <main class="app-content animate-fade-in">
+    <!-- CHAPTER LIST VIEW -->
+    @if (viewState === 'chapterList') {
+      <section class="chapter-list-section">
+        <h2 class="section-title text-gradient">Course Modules</h2>
+        <p class="section-desc">Select a chapter below to start learning Bengali step by step.</p>
+        
+        <div class="chapters-grid">
+          @for (chapter of chapters; track chapter.id) {
+            <div class="chapter-card glass-panel" (click)="selectChapter(chapter)">
+              <div class="chapter-number">{{ chapter.id }}</div>
+              <div class="chapter-info">
+                <h3>{{ chapter.title }}: {{ chapter.subtitle }}</h3>
+                <p>{{ chapter.data.length }} Items to learn</p>
+              </div>
+              <div class="chapter-arrow">→</div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- LEARNING VIEW -->
+    @if (viewState === 'learning') {
+      <section class="learning-section animate-fade-in">
+        <h2 class="section-title text-gradient">{{ selectedChapter.title }}: {{ selectedChapter.subtitle }}</h2>
+        <p class="section-desc">Click on a letter or word to learn it.</p>
+        
+        <div class="letters-grid">
+          @for (char of selectedChapter.data; track char.letter) {
+            <div class="letter-card glass-panel" (click)="openDialog(char)">
+              <span class="letter-char bengali-text" [ngClass]="{'word-char': char.letter.length > 2}">{{ char.letter }}</span>
+              <span class="letter-name">{{ char.name }}</span>
+              @if (char.example) {
+                <span class="letter-example">{{ char.example }}</span>
+              }
+              @if (selectedChapter.id <= 3) {
+                <button class="card-sound-btn" (click)="$event.stopPropagation(); playSound(char)" title="Pronounce">🔊</button>
+              }
+            </div>
+          }
+        </div>
+        
+        <!-- Picture Dialog Overlay -->
+        @if (selectedLetterForDialog) {
+          <div class="dialog-overlay animate-fade-in" (click)="closeDialog()">
+            <div class="dialog-content glass-panel" (click)="$event.stopPropagation()">
+              <button class="close-dialog-btn" (click)="closeDialog()">×</button>
+              
+              <div class="dialog-header">
+                <h3 class="dialog-title text-gradient">
+                  @if (selectedLetterForDialog.relatedWord) {
+                    {{ selectedLetterForDialog.relatedWord.bengali }} ({{ selectedLetterForDialog.relatedWord.english }})
+                  } @else {
+                    {{ selectedLetterForDialog.letter }} - {{ selectedLetterForDialog.name }}
+                  }
+                </h3>
+                <button class="sound-btn" (click)="playSound(selectedLetterForDialog)" title="Play Pronunciation">
+                  🔊
+                </button>
+              </div>
+
+              @if (selectedLetterForDialog.relatedWord) {
+                <p class="dialog-pronunciation">Pronunciation: <strong>{{ selectedLetterForDialog.relatedWord.pronunciation }}</strong></p>
+              }
+
+              <div class="dialog-image-container">
+                <img [src]="selectedLetterForDialog.imageUrl" 
+                     [alt]="selectedLetterForDialog.relatedWord ? selectedLetterForDialog.relatedWord.english : selectedLetterForDialog.name" 
+                     class="dialog-image">
+              </div>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- TEST SETUP VIEW -->
+    @if (viewState === 'testSetup') {
+      <section class="test-setup-section glass-panel animate-fade-in">
+        <div class="test-setup-content">
+          <h2 class="section-title text-gradient">Test Setup: {{ selectedChapter.title }}</h2>
+          <p class="section-desc">How many questions would you like to answer?</p>
+          
+          <div class="input-group">
+            <input type="number" 
+                   class="question-input" 
+                   [(ngModel)]="requestedQuestionCount" 
+                   min="1" 
+                   [max]="selectedChapter.data.length">
+            <span class="max-info">Max: {{ selectedChapter.data.length }}</span>
+          </div>
+
+          <button class="btn-primary start-test-btn" (click)="startTest()">Start Test →</button>
+        </div>
+      </section>
+    }
+
+    <!-- TESTING VIEW -->
+    @if (viewState === 'testing') {
+      <section class="test-section glass-panel animate-fade-in">
+        @if (!testFinished) {
+          <div class="test-header">
+            <h2 class="section-title">Identify the Correct Match</h2>
+            <div class="score-badge">
+              Question: {{ currentQuestionIndex + 1 }} / {{ testQuestions.length }} | Score: {{ score }}
+            </div>
+          </div>
+
+          <div class="question-container">
+            <p class="question-text">Which option matches <span class="highlight text-gradient">"{{ currentTestQuestion?.name }}"</span>?</p>
+            
+            <div class="options-grid">
+              @for (option of testOptions; track option.letter) {
+                <button 
+                  class="option-btn glass-panel" 
+                  (click)="checkAnswer(option)"
+                  [class.correct]="testResult === 'correct' && option.letter === currentTestQuestion?.letter"
+                  [class.wrong]="testResult === 'incorrect' && option.letter === selectedOption?.letter"
+                  [class.disabled]="testResult !== null">
+                  <span class="bengali-text" [ngClass]="{'word-char': option.letter.length > 2}">{{ option.letter }}</span>
+                </button>
+              }
+            </div>
+
+            @if (testResult === 'correct') {
+              <div class="result-message success animate-fade-in">
+                <span class="icon">✨</span> Correct! Well done.
+              </div>
+            } @else if (testResult === 'incorrect') {
+              <div class="result-message error animate-fade-in">
+                <span class="icon">❌</span> Oops, the correct answer was "{{ currentTestQuestion?.letter }}".
+              </div>
+            }
+
+            @if (testResult !== null) {
+              <div class="next-btn-container animate-fade-in">
+                <button class="btn-primary next-question-btn" (click)="nextQuestion()">
+                  @if (currentQuestionIndex + 1 < testQuestions.length) {
+                    Next Question →
+                  } @else {
+                    See Results 🏁
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Test Results -->
+          <div class="test-results-container">
+            <h2 class="section-title text-gradient">Test Complete!</h2>
+            <div class="final-score-display">
+              <div class="score-circle">
+                <span class="score-number">{{ score }}</span>
+                <span class="score-total">/ {{ testQuestions.length }}</span>
+              </div>
+              <p class="score-message">
+                @if (score === testQuestions.length) {
+                  Perfect Score! Outstanding work! 🌟
+                } @else if (score >= testQuestions.length / 2) {
+                  Good job! Keep practicing. 👍
+                } @else {
+                  Don't give up! Try again. 💪
+                }
+              </p>
+            </div>
+            <button class="btn-primary mt-32" (click)="goBack()">Back to Chapters</button>
+          </div>
+        }
+      </section>
+    }
+  </main>
+</div>

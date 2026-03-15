@@ -1,0 +1,53 @@
+<div class="tetris-container">
+  <div class="header-section">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+    <h1 class="game-title text-glow">Tetris</h1>
+    <div class="score-board">
+      <div class="score-box">
+        <span class="score-label">SCORE</span>
+        <span class="score-value">{{ score }}</span>
+      </div>
+      <div class="score-box">
+        <span class="score-label">LEVEL</span>
+        <span class="score-value">{{ level }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-area">
+    <div class="board glass-panel">
+      <!-- Grid Cells -->
+      @for (row of board; track rIndex; let rIndex = $index) {
+        <div class="board-row">
+          @for (cell of row; track cIndex; let cIndex = $index) {
+            <div 
+              class="board-cell" 
+              [style.background-color]="cell ? cell : 'rgba(255, 255, 255, 0.05)'"
+              [class.filled]="cell !== null"
+            ></div>
+          }
+        </div>
+      }
+
+      @if (gameOver) {
+        <div class="overlay game-over-overlay animate-fade-in">
+          <h2 class="overlay-title">Game Over</h2>
+          <p class="final-score">Final Score: {{ score }}</p>
+          <button class="btn-primary" (click)="startGame()">Play Again</button>
+        </div>
+      }
+
+      @if (!isGameRunning && !gameOver) {
+        <div class="overlay start-overlay animate-fade-in">
+          <div class="controls-info">
+            <p>Use <strong>Arrow Keys</strong> to move & rotate.</p>
+            <p>Press <strong>Space</strong> for Quick Drop.</p>
+          </div>
+          <button class="btn-primary" (click)="startGame()">Start Game</button>
+        </div>
+      }
+    </div>
+
+    <!-- Future expansion: Next Piece area -->
+  </div>
+</div>

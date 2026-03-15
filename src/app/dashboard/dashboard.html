@@ -1,0 +1,90 @@
+<div class="dashboard-layout">
+  <!-- Left Panel -->
+  <aside class="side-panel left-panel glass-panel animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="profile-section">
+      <div class="avatar">R</div>
+      <h3 class="profile-name">Reshma</h3>
+      <p class="profile-status">Journey Starter</p>
+    </div>
+    <nav class="side-nav">
+      <a class="nav-item active">
+        <span class="icon">🏠</span> Home
+      </a>
+      <a class="nav-item">
+        <span class="icon">⭐</span> Achievements
+      </a>
+      <a class="nav-item">
+        <span class="icon">⚙️</span> Settings
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Middle Panel (Main Content) -->
+  <main class="main-panel animate-fade-in" style="animation-delay: 0.2s;">
+    <!-- Upper Jumbotron -->
+    <header class="jumbotron glass-panel">
+      <div class="jumbo-content">
+        <h1 class="jumbo-title bengali-text text-glow">হাই রেশমা!</h1>
+        <p class="jumbo-subtitle">Welcome back. What would you like to explore today?</p>
+      </div>
+      <div class="jumbo-illustration">
+        <!-- Abstract shape or illustration for Premium feel -->
+        <div class="shape-blob"></div>
+      </div>
+    </header>
+
+    <!-- Lower Panel (Apps List) -->
+    <section class="apps-section">
+      <h2 class="section-title">Available Applications</h2>
+      
+      <div class="apps-grid">
+        <!-- App Card 1 -->
+        <div class="app-card glass-panel" (click)="navigateTo('learn-bengali')">
+          <div class="app-card-bg card-bg-1"></div>
+          <div class="app-content">
+            <div class="app-icon">অ</div>
+            <h3 class="app-title">Learn Bengali</h3>
+            <p class="app-desc">Master the Bengali alphabet in a fun, interactive way.</p>
+            <button class="app-btn">Start Learning →</button>
+          </div>
+        </div>
+
+        <!-- App Card 2 -->
+        <div class="app-card glass-panel" (click)="navigateTo('tetris')">
+          <div class="app-card-bg card-bg-2"></div>
+          <div class="app-content">
+            <div class="app-icon">🎮</div>
+            <h3 class="app-title">Play Tetris</h3>
+            <p class="app-desc">Take a break with the classic block puzzle game.</p>
+            <button class="app-btn">Play Now →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Right Panel -->
+  <aside class="side-panel right-panel glass-panel animate-fade-in" style="animation-delay: 0.3s;">
+    <div class="widget">
+      <h3 class="widget-title">Daily Progress</h3>
+      <div class="progress-ring-container">
+        <!-- SVG for a progress ring -->
+        <svg class="progress-ring" width="120" height="120">
+          <circle class="progress-ring__circle bg" stroke="var(--bg-secondary)" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+          <circle class="progress-ring__circle fill" stroke="var(--accent-primary)" stroke-width="8" fill="transparent" r="52" cx="60" cy="60" style="stroke-dasharray: 326; stroke-dashoffset: 130;"/>
+        </svg>
+        <div class="progress-text">60%</div>
+      </div>
+      <p class="widget-desc">You are on a 3-day streak! Keep it up!</p>
+    </div>
+    
+    <div class="widget recent-activity">
+      <h3 class="widget-title">Recent Activity</h3>
+      <ul class="activity-list">
+        <li>Completed Chapter 1 <span class="time">2d ago</span></li>
+        <li>Played Tetris (Score: 1200) <span class="time">3d ago</span></li>
+        <li>Joined the Journey <span class="time">4d ago</span></li>
+      </ul>
+    </div>
+  </aside>
+</div>
